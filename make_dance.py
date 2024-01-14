@@ -2,7 +2,10 @@ from PIL import Image, ImageDraw
 from dataclasses import dataclass
 import numpy as np
 import math
+import dataclasses
 from typing import Self
+
+from tweener import produce_tweens
 
 
 # Eventually I think we'll want a two pass ordered by Z where we compute the
@@ -294,18 +297,38 @@ def draw_frame(frames, body, body_params):
 
     frames.append(frame_image)
 
-for anim_angle in range(0, 46, 5):
-    body_params.neck_left_collar_bone = shoulder_start-anim_angle
-    body_params.left_upper_arm_left_forearm = elbow_start+anim_angle
-    draw_frame(images, body, body_params)
+start_position = dataclasses.replace(body_params)
+end_position = dataclasses.replace(body_params)
+end_position.neck_left_collar_bone=shoulder_start-45
+end_position.left_upper_arm_left_forearm=elbow_start+45
+end_position.neck_head = 75
+for position in produce_tweens(start_position, end_position, 10):
+    draw_frame(images, body, position)
 
-for anim_angle in range(45, -1, -5):
-    body_params.neck_left_collar_bone = shoulder_start-anim_angle
-    body_params.left_upper_arm_left_forearm = elbow_start+anim_angle
-    draw_frame(images, body, body_params)
+start_position = dataclasses.replace(end_position)
+end_position.neck_left_collar_bone=shoulder_start
+end_position.left_upper_arm_left_forearm=elbow_start
+for position in produce_tweens(start_position, end_position, 10):
+    draw_frame(images, body, position)
+
+start_position = dataclasses.replace(end_position)
+end_position.neck_head = 90
+for position in produce_tweens(start_position, end_position, 6):
+    draw_frame(images, body, position)
+
+body_params = end_position
+
+#for anim_angle in range(0, 46, 5):
+#    body_params.neck_left_collar_bone = shoulder_start-anim_angle
+#    body_params.left_upper_arm_left_forearm = elbow_start+anim_angle
+#    draw_frame(images, body, body_params)
+
+#for anim_angle in range(45, -1, -5):
+#    body_params.neck_left_collar_bone = shoulder_start-anim_angle
+#    body_params.left_upper_arm_left_forearm = elbow_start+anim_angle
+#    draw_frame(images, body, body_params)
 
 for repeat in range(3):
-    3
     for anim in range(10):
         body_params.spine_neck = -10
         body_params.left_hip_left_thigh = 50

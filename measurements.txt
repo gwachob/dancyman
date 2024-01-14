@@ -1,0 +1,67 @@
+Body parts - 15 joints, 19 segments
+
+Joints:
+* neck top (face comes off this)
+* neck bottom (each collar bone attaches to this)
+* hip (center of line on which hip segments lie):
+* left shoulder
+* left elbow
+* left wrist
+* right shoulder
+* right elbow
+* right wrist
+* left hip
+* left knee
+* left ankle
+* right hip
+* right knee
+* right ankle
+
+Segments:
+* Face
+* Neck
+* Spine - 63
+* Left collar bone - 23
+* Left upper arm - 35
+* Left forearm - 27
+* Left hand - 16
+* Right collar bone
+* Right upper arm
+* Right forearm
+* Right hand
+* Hip left - 21
+* Hip right (always colinear with hip left)
+* Left thigh - 39
+* Left shin - 43
+* Left foot = 26
+* Right thigh
+* Right shin
+* Right foot
+
+---
+
+Layout order (separate from z order):
+
+Spine
+Neck
+Face
+Shoulders
+Upper Arms
+Fore Aarms
+Hands
+Hips
+Thighs
+Shins
+Feet
+
+---
+
+Angle Constraints:
+
+hip to hip - 180
+neck to face - +90 or -90
+shoulder to neck
+
+
+
+  

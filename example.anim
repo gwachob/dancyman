@@ -1,0 +1,13 @@
+*1
+>10
+neck_head=60
+>10
+neck_head=90
+>10
+neck_left_collar_bone=70,neck_right_collar_bone=-110
+>20
+neck_left_collar_bone=110,neck_right_collar_bone=-70
+>10
+neck_left_collar_bone=90,neck_right_collar_bone=-90
+
+

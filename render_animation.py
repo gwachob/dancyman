@@ -1,5 +1,5 @@
 import sys
-from make_dance import make_frame, Body, BodyParams
+from stickman import make_frame, Body, BodyParams
 from tweener import produce_tweens
 import dataclasses
 

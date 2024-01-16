@@ -1,16 +1,25 @@
 import sys
 from stickman import Body, BodyParams
-from stickman_pil import make_frame
-from tweener import produce_tweens
-import dataclasses
+from stickman_pil import make_pil_frame
+from renderer import Renderer
 
 
-def update_params_from_line(body_params, line):
-    params = line.split(",")
-    for param in params:
-        param = param.strip()
-        (name, value) = param.split("=")
-        setattr(body_params, name, float(value))
+class PILRenderer(Renderer):
+    def __init__(self, infile, body: Body, body_params: BodyParams):
+        super().__init__(infile, body, body_params)
+        self.results: [Image] = []
+
+    def render_frame(self):
+        self.results.append(make_pil_frame(self.body, self.body_params))
+
+    def render_last_frame(self):
+        self.results.append(self.results[-1])
+
+    def write_animated_gif(self, filename: str):
+        if len(self.results) > 0:
+            self.results[0].save(
+                "animation.gif", save_all=True, append_images=self.results[1:]
+            )
 
 
 if __name__ == "__main__":
@@ -19,39 +28,14 @@ if __name__ == "__main__":
     else:
         infile = sys.stdin
 
-    WIDTH = 500
-    HEIGHT = 500
+    width = 500
+    height = 500
 
     images = []
     body_params = BodyParams()
-    body = Body(WIDTH, HEIGHT)
+    body = Body(width, height)
     tween_count = 0
 
-    for line in infile:
-        line = line.strip()
-        if line.startswith("#") or line == "":
-            continue
-        elif line.startswith("*"):
-            repetitions = int(line[1:])
-            if len(images) == 0:
-                frame_to_copy = make_frame(body, body_params)
-            else:
-                frame_to_copy = images[-1]
-
-            # Not adding multiple copies, just multiple references to the same frame
-            images.extend([frame_to_copy] * repetitions)
-        elif line.startswith(">"):
-            tween_count = int(line[1:])
-        else:
-            if tween_count > 0:
-                start = dataclasses.replace(body_params)
-            update_params_from_line(body_params, line)
-            if tween_count > 0:
-                for position in produce_tweens(start, body_params, tween_count):
-                    images.append(make_frame(body, position))
-                body_params = position
-                tween_count = 0
-            else:
-                images.append(make_frame(body, body_params))
-    if len(images) > 0:
-        images[0].save("animation.gif", save_all=True, append_images=images[1:])
+    renderer = PILRenderer(infile, body, body_params)
+    renderer.render()
+    renderer.write_animated_gif("animation.gif")

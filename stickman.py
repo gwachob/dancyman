@@ -1,10 +1,6 @@
-from PIL import Image, ImageDraw
 from dataclasses import dataclass
 import math
-import dataclasses
 from typing import Self
-
-from tweener import produce_tweens
 
 
 # Eventually I think we'll want a two pass ordered by Z where we compute the
@@ -62,44 +58,39 @@ class Segment:
 
 # HARDCODED for now, but possibly these could be params too?
 
-BODY_COLOR = (255, 255, 255)
+SPINE_SIZE = 63
+NECK_SIZE = 20
+FACE_SIZE = 20
+SHOULDER_SIZE = 23
+UPPER_ARM_SIZE = 35
+FOREARM_SIZE = 27
+HAND_SIZE = 16
+HIP_SIZE = 21
+THIGH_SIZE = 39
+SHIN_SIZE = 43
+FOOT_SIZE = 26
 
-SPINE_SIZE = 63 
-NECK_SIZE = 20 
-FACE_SIZE = 20 
-SHOULDER_SIZE = 23 
-UPPER_ARM_SIZE = 35 
-FOREARM_SIZE = 27 
-HAND_SIZE = 16 
-HIP_SIZE = 21 
-THIGH_SIZE = 39 
-SHIN_SIZE = 43 
-FOOT_SIZE = 26 
-
-def scale_color(color: (int, int, int), scale: float) -> (int, int, int):
-    return (int(color[0] * scale),int(color[1] * scale), int(color[2] * scale))
- 
 
 @dataclass
 class BodyParams:
     """
-        Class that contains all the configurations params for all parts of the body.
-        Primarily this is a list of angles between segments.
-        This gets updated each 'frame' of an animation to define the animation.
+         Class that contains all the configurations params for all parts of the body.
+         Primarily this is a list of angles between segments.
+         This gets updated each 'frame' of an animation to define the animation.
 
-    The format is to define the angle between two segments, relative to the
-    direction of the segment mentioned first.
+     The format is to define the angle between two segments, relative to the
+     direction of the segment mentioned first.
 
-    The spine is expected to be the reference, vertical (for now).
+     The spine is expected to be the reference, vertical (for now).
 
-    0,0 is in the upper left (image coordinates) and angles are calculated
-   need to actually modify the 
+     0,0 is in the upper left (image coordinates) and angles are calculated
+    need to actually modify the
 
-    All angles expressed in degrees, clockwise (which may be confusing we
-    may need to switch this convention to the polar coordinate system)
+     All angles expressed in degrees, clockwise (which may be confusing we
+     may need to switch this convention to the polar coordinate system)
     """
 
-    spine_neck: float = 0 # colinear
+    spine_neck: float = 0  # colinear
     neck_head: float = 90.0
     neck_left_collar_bone: float = 90.0
     left_collar_bone_left_upper_arm: float = 60.0
@@ -129,7 +120,7 @@ class Body:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.scale_factor = (height / 3) / SPINE_SIZE 
+        self.scale_factor = (height / 3) / SPINE_SIZE
         self.segments: list[Segments] = []
         self.center = (width / 2, height / 3)
         self.spine_size = SPINE_SIZE * self.scale_factor
@@ -137,13 +128,12 @@ class Body:
         self.face_size = FACE_SIZE * self.scale_factor
         self.shoulder_size = SHOULDER_SIZE * self.scale_factor
         self.upper_arm_size = UPPER_ARM_SIZE * self.scale_factor
-        self.forearm_size = FOREARM_SIZE * self.scale_factor 
+        self.forearm_size = FOREARM_SIZE * self.scale_factor
         self.hand_size = HAND_SIZE * self.scale_factor
         self.hip_size = HIP_SIZE * self.scale_factor
         self.thigh_size = THIGH_SIZE * self.scale_factor
         self.shin_size = SHIN_SIZE * self.scale_factor
         self.foot_size = FOOT_SIZE * self.scale_factor
-
 
     def update_params(self, params: BodyParams):
         """Updates the segments"""
@@ -154,8 +144,8 @@ class Body:
         #        neck_bottom = Joint(CENTER[0], int(CENTER[1] - SPINE_SIZE/2))
         #        hip = Joint(CENTER[0], int(CENTER[1] + SPINE_SIZE/2))
         spine = Segment(
-            Point(self.center[0], int(self.center[1] - self.spine_size/ 2)),
-            Point(self.center[0], int(self.center[1] + self.spine_size/ 2)),
+            Point(self.center[0], int(self.center[1] - self.spine_size / 2)),
+            Point(self.center[0], int(self.center[1] + self.spine_size / 2)),
             self.spine_size,
             0,
             0,
@@ -165,11 +155,16 @@ class Body:
         neck = Segment.from_point(spine.start, self.neck_size, params.spine_neck, 0)
         self.segments.append(neck)
 
-        face = Segment.from_point(neck.end, self.face_size, neck.angle + params.neck_head, 0)
+        face = Segment.from_point(
+            neck.end, self.face_size, neck.angle + params.neck_head, 0
+        )
         self.segments.append(face)
 
         left_collar_bone = Segment.from_point(
-            spine.start, self.shoulder_size, neck.angle + params.neck_left_collar_bone, 0
+            spine.start,
+            self.shoulder_size,
+            neck.angle + params.neck_left_collar_bone,
+            0,
         )
         self.segments.append(left_collar_bone)
 
@@ -198,7 +193,10 @@ class Body:
         self.segments.append(left_hand)
 
         right_collar_bone = Segment.from_point(
-            spine.start, self.shoulder_size, neck.angle + params.neck_right_collar_bone, 0
+            spine.start,
+            self.shoulder_size,
+            neck.angle + params.neck_right_collar_bone,
+            0,
         )
         self.segments.append(right_collar_bone)
 
@@ -226,7 +224,6 @@ class Body:
         )
         self.segments.append(right_hand)
 
-
         left_hip = Segment.from_point(
             spine.end, self.hip_size, spine.angle + params.spine_left_hip, 0
         )
@@ -248,7 +245,7 @@ class Body:
         )
         self.segments.append(left_shin)
 
-        left_foot= Segment.from_point(
+        left_foot = Segment.from_point(
             left_shin.end,
             self.foot_size,
             left_shin.angle + params.left_shin_left_foot,
@@ -277,7 +274,7 @@ class Body:
         )
         self.segments.append(right_shin)
 
-        right_foot= Segment.from_point(
+        right_foot = Segment.from_point(
             right_shin.end,
             self.foot_size,
             right_shin.angle + params.right_shin_right_foot,
@@ -285,90 +282,5 @@ class Body:
         )
         self.segments.append(right_foot)
 
-
     def get_segments(self) -> list[Segment]:
         return sorted(self.segments, key=lambda segment: segment.z_order)
-
-def make_frame(body, body_params):
-    frame_image = Image.new("RGB", (body.width, body.height))
-    draw = ImageDraw.Draw(frame_image)
-    body.update_params(body_params)
-    segments = body.get_segments()
-
-    for segment in segments:
-        draw.line(segment.to_tuples(), fill=scale_color(BODY_COLOR, 1-segment.z_order))
-    return frame_image
-
-    
-def append_frame(frames, body, body_params):
-    frames.append(make_frame(body, body_params))
-
-if __name__ == "__main__":
-    images = []
-    WIDTH = 500
-    HEIGHT = 500
-    body_params = BodyParams()
-    body = Body(WIDTH, HEIGHT)
-    shoulder_start = body_params.neck_left_collar_bone
-    elbow_start = body_params.left_upper_arm_left_forearm
-
-
-    start_position = dataclasses.replace(body_params)
-    end_position = dataclasses.replace(body_params)
-    end_position.neck_left_collar_bone=shoulder_start-45
-    end_position.left_upper_arm_left_forearm=elbow_start+45
-    end_position.neck_head = 75
-    for position in produce_tweens(start_position, end_position, 10):
-        append_frame(images, body, position)
-
-    start_position = dataclasses.replace(end_position)
-    end_position.neck_left_collar_bone=shoulder_start
-    end_position.left_upper_arm_left_forearm=elbow_start
-    for position in produce_tweens(start_position, end_position, 10):
-        append_frame(images, body, position)
-
-    start_position = dataclasses.replace(end_position)
-    end_position.neck_head = 90
-    for position in produce_tweens(start_position, end_position, 6):
-        append_frame(images, body, position)
-
-    body_params = end_position
-
-    #for anim_angle in range(0, 46, 5):
-    #    body_params.neck_left_collar_bone = shoulder_start-anim_angle
-    #    body_params.left_upper_arm_left_forearm = elbow_start+anim_angle
-    #    append_frame(images, body, body_params)
-
-    #for anim_angle in range(45, -1, -5):
-    #    body_params.neck_left_collar_bone = shoulder_start-anim_angle
-    #    body_params.left_upper_arm_left_forearm = elbow_start+anim_angle
-    #    append_frame(images, body, body_params)
-
-    for repeat in range(3):
-        for anim in range(10):
-            body_params.spine_neck = -10
-            body_params.left_hip_left_thigh = 50
-            body_params.right_hip_right_thigh = -50
-            append_frame(images, body, body_params)
-
-        for anim in range(10):
-            body_params.spine_neck = 10 
-            body_params.left_hip_left_thigh = 75 
-            body_params.right_hip_right_thigh = -75
-            append_frame(images, body, body_params)
-
-    for anim in range(10, -1, -1):
-        body_params.spine_neck = anim
-        append_frame(images, body, body_params)
-
-    for repeat in range(10):
-        for anim in range(5):
-            body_params.left_shin_left_foot = 90
-            body_params.right_shin_right_foot = -90
-            append_frame(images, body, body_params)
-        for anim in range(5):
-            body_params.left_shin_left_foot = -90
-            body_params.right_shin_right_foot = 90
-            append_frame(images, body, body_params)
-
-    images[0].save("splits.gif", save_all=True, append_images=images[1:])

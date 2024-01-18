@@ -1,5 +1,4 @@
 import math
-from typing import Self
 
 
 # Eventually I think we'll want a two pass ordered by Z where we compute the
@@ -42,7 +41,7 @@ class Segment:
         length: float,
         rotation: float,
         z_order: float,
-    ) -> Self:
+    ):   # Returns Self, but typing module not available on Circuitpython
         rotation_rad = math.radians(rotation)
         # Lots of fun math
         end_x = start.x + length * math.sin(rotation_rad)

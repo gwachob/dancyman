@@ -1,6 +1,10 @@
 from stickman import Body, BodyParams
 from tweener import produce_tweens
-import copy 
+
+try:
+    import copy 
+except ImportError:
+    import cp_copy as copy
 
 
 class Renderer:

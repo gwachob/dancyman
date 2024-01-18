@@ -1,4 +1,7 @@
-import copy
+try:
+    import copy 
+except ImportError:
+    import cp_copy as copy
 
 class TweenChange:
     def __init__(self, field_name, start_value, end_value):

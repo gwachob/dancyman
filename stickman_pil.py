@@ -1,4 +1,4 @@
-import dataclasses
+import copy 
 from PIL import Image, ImageDraw
 from stickman import Body, BodyParams
 from tweener import produce_tweens
@@ -36,21 +36,21 @@ if __name__ == "__main__":
     shoulder_start = body_params.neck_left_collar_bone
     elbow_start = body_params.left_upper_arm_left_forearm
 
-    start_position = dataclasses.replace(body_params)
-    end_position = dataclasses.replace(body_params)
+    start_position = copy.deepcopy(body_params)
+    end_position = copy.deepcopy(body_params)
     end_position.neck_left_collar_bone = shoulder_start - 45
     end_position.left_upper_arm_left_forearm = elbow_start + 45
     end_position.neck_head = 75
     for position in produce_tweens(start_position, end_position, 10):
         append_pil_frame(images, body, position)
 
-    start_position = dataclasses.replace(end_position)
+    start_position = copy.deepcopy(end_position)
     end_position.neck_left_collar_bone = shoulder_start
     end_position.left_upper_arm_left_forearm = elbow_start
     for position in produce_tweens(start_position, end_position, 10):
         append_pil_frame(images, body, position)
 
-    start_position = dataclasses.replace(end_position)
+    start_position = copy.deepcopy(end_position)
     end_position.neck_head = 90
     for position in produce_tweens(start_position, end_position, 6):
         append_pil_frame(images, body, position)

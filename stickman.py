@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import math
 from typing import Self
 
@@ -15,8 +14,11 @@ from typing import Self
 # For now, our coordinate system matches PILLOW and is scaled by HEIGHT and WIDTH
 
 
-@dataclass
 class Point:
+    def __init__(self, x:int, y:int):
+        self.x = x
+        self.y = y
+
     x: int = 0
     y: int = 0
 
@@ -24,13 +26,14 @@ class Point:
         return (self.x, self.y)
 
 
-@dataclass
 class Segment:
-    start: Point
-    end: Point
-    length: float
-    angle: float
-    z_order: float
+
+    def __init__(self, start:Point, end:Point, length:float, angle:float, z_order: float):
+        self.start = start
+        self.end = end 
+        self.length = length
+        self.angle = angle
+        self.z_order = z_order
 
     @classmethod
     def from_point(
@@ -71,7 +74,6 @@ SHIN_SIZE = 43
 FOOT_SIZE = 26
 
 
-@dataclass
 class BodyParams:
     """
          Class that contains all the configurations params for all parts of the body.
@@ -89,31 +91,30 @@ class BodyParams:
      All angles expressed in degrees, clockwise (which may be confusing we
      may need to switch this convention to the polar coordinate system)
     """
+    def __init__(self):
+        self.spine_neck: float = 0  # colinear
+        self.neck_head: float = 90.0
+        self.neck_left_collar_bone: float = 90.0
+        self.left_collar_bone_left_upper_arm: float = 60.0
+        self.left_upper_arm_left_forearm: float = 40.0
+        self.left_forearm_left_hand: float = -70.0
 
-    spine_neck: float = 0  # colinear
-    neck_head: float = 90.0
-    neck_left_collar_bone: float = 90.0
-    left_collar_bone_left_upper_arm: float = 60.0
-    left_upper_arm_left_forearm: float = 40.0
-    left_forearm_left_hand: float = -70.0
+        self.neck_right_collar_bone: float = -90.0
+        self.right_collar_bone_right_upper_arm: float = -60.0
+        self.right_upper_arm_right_forearm: float = -40.0
+        self.right_forearm_right_hand: float = 70.0
 
-    neck_right_collar_bone: float = -90.0
-    right_collar_bone_right_upper_arm: float = -60.0
-    right_upper_arm_right_forearm: float = -40.0
-    right_forearm_right_hand: float = 70.0
+        self.spine_left_hip: float = 90.0  # Hips don't articulate, this should be 180 from spine_right_hip
 
-    spine_left_hip: float = (
-        90.0  # Hips don't articulate, this should be 180 from spine_right_hip
-    )
+        self.left_hip_left_thigh: float = 75.0
+        self.left_thigh_left_shin: float = 15.0
+        self.left_shin_left_foot: float = -90.0
 
-    left_hip_left_thigh: float = 75.0
-    left_thigh_left_shin: float = 15.0
-    left_shin_left_foot: float = -90.0
-
-    spine_right_hip: float = -90.0
-    right_hip_right_thigh: float = -75.0
-    right_thigh_right_shin: float = -15.0
-    right_shin_right_foot: float = 90.0
+        self.spine_right_hip: float = -90.0
+        self.right_hip_right_thigh: float = -75.0
+        self.right_thigh_right_shin: float = -15.0
+        self.right_shin_right_foot: float = 90.0
+        
 
 
 class Body:

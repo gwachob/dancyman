@@ -1,6 +1,6 @@
 from stickman import Body, BodyParams
 from tweener import produce_tweens
-import dataclasses
+import copy 
 
 
 class Renderer:
@@ -48,8 +48,8 @@ class Renderer:
                 tween_count = int(line[1:])
             else:
                 if tween_count > 0:
-                    start = dataclasses.replace(self.body_params)
-                    end = dataclasses.replace(self.body_params)
+                    start = copy.deepcopy(self.body_params)
+                    end = copy.deepcopy(self.body_params)
                     self.update_params_from_line(end, line)
                     for position in produce_tweens(start, end, tween_count):
                         self.body_params = position

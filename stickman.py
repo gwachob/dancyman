@@ -117,12 +117,16 @@ class BodyParams:
 
 
 class Body:
-    def __init__(self, width, height):
+    def __init__(self, width, height, overall_scale_factor:float=3.0):
         self.width = width
         self.height = height
-        self.scale_factor = (height / 3) / SPINE_SIZE
         self.segments: list[Segments] = []
         self.center = (width / 2, height / 3)
+        self.set_scale_factor(overall_scale_factor)
+
+    def set_scale_factor(self, overall_scale_factor: float):
+        self.overall_scale_factor = overall_scale_factor
+        self.scale_factor = (self.height / overall_scale_factor) / SPINE_SIZE
         self.spine_size = SPINE_SIZE * self.scale_factor
         self.neck_size = NECK_SIZE * self.scale_factor
         self.face_size = FACE_SIZE * self.scale_factor

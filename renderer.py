@@ -12,6 +12,7 @@ class Renderer:
         self.infile = infile
         self.body = body
         self.body_params = body_params
+        self.config={}
 
     def render_frame(self):
         """Return an object that represents a rendered frame."""
@@ -31,6 +32,19 @@ class Renderer:
             param = param.strip()
             (name, value) = param.split("=")
             setattr(orig, name, float(value))
+    
+    def update_options_from_line(self, line):
+        params = line.split(",")
+        for param in params:
+            param = param.strip()
+            (name, value) = param.split("=")
+            if name == "scale":
+                self.config[name] = float(value)
+                self.body.set_scale_factor(float(value))
+            if value.startswith('"'):
+                self.config[name] = value
+            else:
+                self.config[name] = float(value)
 
     def render(self) -> int:
         count = 0
@@ -50,6 +64,8 @@ class Renderer:
                         count += 1
             elif line.startswith(">"):
                 tween_count = int(line[1:])
+            elif line.startswith("!"):
+                self.update_options_from_line(line[1:])
             else:
                 if tween_count > 0:
                     start = copy.deepcopy(self.body_params)
